@@ -11,6 +11,7 @@ function search(str) {
 	//converts the search to lowercase
 	let lowerStr = str.toLowerCase();
 	//filters the fruit based on whether each fruit contains the string
+	//Also coverts the fruit to lowercase when searching
 	let results = fruit.filter(eachFruit => eachFruit.toLowerCase().includes(lowerStr));
 	return results;
 }
@@ -22,7 +23,8 @@ function searchHandler(e) {
 	clearList();
 	// gets the innerText of the search box
 	let query = input.value;
-	//Checks if there's anything even being searched
+
+	//Checks if there's anything being searched
 	if(query !== ""){
 		//searches through to find matching fruit
 		let results = search(query);
@@ -33,40 +35,46 @@ function searchHandler(e) {
 		}
 		//Shows the suggestions
 		showSuggestions(results, query);
-	}else{console.log("Nothing is being searched");}
+
+	//If the box is blank
+	}else{
+		//Repopulates the box with the default value
+		input.value = input.defaultValue;
+		//console.log("Nothing is being searched");
+	}
 }
 
+//function to clear the list
 function clearList(){
 	//Checks if there are listed items
 	if(suggestions.children.length > 0){
 		//removes all children from the unordered list
-		for (eachChild of Array.from(suggestions.children)){
-			eachChild.remove();
-		}
-		console.log("cleared the list");
-	}else{
-		console.log("nothing to remove");}
+		Array.from(suggestions.children).forEach(eachChild => eachChild.remove());
+	}
 }
 
 //updates the dropdown with search results
 function showSuggestions(results, inputVal) {
 	//populates the dropdown menu
-	for (eachResult of results){
-		let sugg = document.createElement('li');
+	results.forEach(eachResult => {
+		//Creates an li element
+		let suggLI = document.createElement('li');
 		//Sets the inner text to be the result with the part containing the query to be bold
-		sugg.innerHTML = boldSuggestion(eachResult, inputVal);
+		suggLI.innerHTML = boldSuggestion(eachResult, inputVal);
 
 		//Mouseover listener to highlight each search result
-		sugg.addEventListener('mouseover', highlightSuggestion);
+		suggLI.addEventListener('mouseover', highlightSuggestion);
 		//Mouseout listener to un-highlight each result
-		sugg.addEventListener('mouseout', unhighlightSuggestion);
+		suggLI.addEventListener('mouseout', unhighlightSuggestion);
 
-		suggestions.appendChild(sugg);
-	}
+		//Appends the new li to the ul
+		suggestions.appendChild(suggLI);
+	});
 }
 
+//function to put the parts of each fruit that match the query in bold
 function boldSuggestion(fruit, query){
-	//Sets the fruit/query to lowerCase for indexOf
+	//Sets the fruit & query to lowerCase for indexOf
 	let fruitLower = fruit.toLowerCase();
 	let queryLower = query.toLowerCase();
 	//gets starting position of the query in the fruit string
