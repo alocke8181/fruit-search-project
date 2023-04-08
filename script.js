@@ -100,13 +100,13 @@ function useSuggestion(e) {
 //highlights the search suggestion the user is over
 function highlightSuggestion(e){
 	let targetLI = e.currentTarget;
-	targetLI.style.backgroundColor = "chocolate";
+	targetLI.classList.add('hover');
 }
 
 //unhighlights the suggestion the user moused over
 function unhighlightSuggestion(e){
 	let targetLI = e.currentTarget;
-	targetLI.style.backgroundColor = "";
+	targetLI.classList.remove('hover');
 }
 
 //Key listener for the search bar
