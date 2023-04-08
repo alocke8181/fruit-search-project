@@ -1,4 +1,6 @@
+//Gets the input bar
 const input = document.querySelector('#fruit');
+//Gets the unordered list
 const suggestions = document.querySelector('.suggestions ul');
 
 const fruit = ['Apple', 'Apricot', 'Avocado 🥑', 'Banana', 'Bilberry', 'Blackberry', 'Blackcurrant', 'Blueberry', 'Boysenberry', 'Currant', 'Cherry', 'Coconut', 'Cranberry', 'Cucumber', 'Custard apple', 'Damson', 'Date', 'Dragonfruit', 'Durian', 'Elderberry', 'Feijoa', 'Fig', 'Gooseberry', 'Grape', 'Raisin', 'Grapefruit', 'Guava', 'Honeyberry', 'Huckleberry', 'Jabuticaba', 'Jackfruit', 'Jambul', 'Juniper berry', 'Kiwifruit', 'Kumquat', 'Lemon', 'Lime', 'Loquat', 'Longan', 'Lychee', 'Mango', 'Mangosteen', 'Marionberry', 'Melon', 'Cantaloupe', 'Honeydew', 'Watermelon', 'Miracle fruit', 'Mulberry', 'Nectarine', 'Nance', 'Olive', 'Orange', 'Clementine', 'Mandarine', 'Tangerine', 'Papaya', 'Passionfruit', 'Peach', 'Pear', 'Persimmon', 'Plantain', 'Plum', 'Pineapple', 'Pomegranate', 'Pomelo', 'Quince', 'Raspberry', 'Salmonberry', 'Rambutan', 'Redcurrant', 'Salak', 'Satsuma', 'Soursop', 'Star fruit', 'Strawberry', 'Tamarillo', 'Tamarind', 'Yuzu'];
@@ -16,6 +18,8 @@ function search(str) {
 
 //event handler for when the user types in the search box
 function searchHandler(e) {
+	//Clears the list
+	clearList();
 	// gets the innerText of the search box
 	let query = input.value;
 	//Checks if there's anything even being searched
@@ -27,37 +31,46 @@ function searchHandler(e) {
 		if (results.length > 5){
 			results = results.slice(0,5);
 		}
-		//shows the suggestions
+		//Shows the suggestions
 		showSuggestions(results, query);
 	}else{console.log("Nothing is being searched");}
 }
 
+function clearList(){
+	//Checks if there are listed items
+	if(suggestions.children.length > 0){
+		//removes all children from the unordered list
+		for (eachChild of Array.from(suggestions.children)){
+			eachChild.remove();
+		}
+		console.log("cleared the list");
+	}else{
+		console.log("nothing to remove");}
+}
 
 //updates the dropdown with search results
 function showSuggestions(results, inputVal) {
-	//Checks if there are listed items
-	if(suggestions.children[0]){
-		//removes all children from the unordered list
-		for (eachChild of suggestions.children){
-			eachChild.remove();
-		}
-	}else{console.log("nothing to remove");}
 	//populates the dropdown menu
 	for (eachResult of results){
 		let sugg = document.createElement('li');
 		//Sets the inner text to be the result with the part containing the query to be bold
 		sugg.innerHTML = boldSuggestion(eachResult, inputVal);
-		console.log(sugg.innerHTML);
-	}
-	//highlights sections of each in bold based on user input
 
+		//Mouseover listener to highlight each search result
+		sugg.addEventListener('mouseover', highlightSuggestion);
+		//Mouseout listener to un-highlight each result
+		sugg.addEventListener('mouseout', unhighlightSuggestion);
+
+		suggestions.appendChild(sugg);
+	}
 }
 
 function boldSuggestion(fruit, query){
-	//Sets the fruit to lowerCase for indexOf
+	//Sets the fruit/query to lowerCase for indexOf
 	let fruitLower = fruit.toLowerCase();
+	let queryLower = query.toLowerCase();
 	//gets starting position of the query in the fruit string
-	let firstIndx = fruitLower.indexOf(query);
+	let firstIndx = fruitLower.indexOf(queryLower);
 	//gets the ending position of the query in the fruit string
 	let lastIndx = firstIndx + query.length;
 	//Slices the fruit into three strings
@@ -72,25 +85,31 @@ function boldSuggestion(fruit, query){
 //fills the search bar with the result the user clicks on
 function useSuggestion(e) {
 	// gets the target of the users click
-
+	let targetLI = e.target;
+	//Checks if the user clicked on the bold section
+	if (targetLI.tagName == "B"){
+		//sets the target to the parent element
+		targetLI = targetLI.parentElement;
+	}
 	//populates the search bar innerText with the suggestion innerText
+	input.value = targetLI.innerText;
+	//Clears the search list
+	clearList();
 }
 
 //highlights the search suggestion the user is over
 function highlightSuggestion(e){
-
+	let targetLI = e.currentTarget;
+	targetLI.style.backgroundColor = "chocolate";
 }
 
 //unhighlights the suggestion the user moused over
 function unhighlightSuggestion(e){
-
+	let targetLI = e.currentTarget;
+	targetLI.style.backgroundColor = "";
 }
 
 //Key listener for the search bar
 input.addEventListener('keyup', searchHandler);
 //Click listener for each search result
 suggestions.addEventListener('click', useSuggestion);
-//Mouseover listener to highlight each search result
-suggestions.addEventListener('mouseover', highlightSuggestion);
-//Mouseout listener to un-highlight each result
-suggestions.addEventListener('mouseout', unhighlightSuggestion);
