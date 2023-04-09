@@ -2,9 +2,10 @@
 const input = document.querySelector('#fruit');
 //Gets the unordered list
 const suggestions = document.querySelector('.suggestions ul');
-
+//Array of results
 const fruit = ['Apple', 'Apricot', 'Avocado 🥑', 'Banana', 'Bilberry', 'Blackberry', 'Blackcurrant', 'Blueberry', 'Boysenberry', 'Currant', 'Cherry', 'Coconut', 'Cranberry', 'Cucumber', 'Custard apple', 'Damson', 'Date', 'Dragonfruit', 'Durian', 'Elderberry', 'Feijoa', 'Fig', 'Gooseberry', 'Grape', 'Raisin', 'Grapefruit', 'Guava', 'Honeyberry', 'Huckleberry', 'Jabuticaba', 'Jackfruit', 'Jambul', 'Juniper berry', 'Kiwifruit', 'Kumquat', 'Lemon', 'Lime', 'Loquat', 'Longan', 'Lychee', 'Mango', 'Mangosteen', 'Marionberry', 'Melon', 'Cantaloupe', 'Honeydew', 'Watermelon', 'Miracle fruit', 'Mulberry', 'Nectarine', 'Nance', 'Olive', 'Orange', 'Clementine', 'Mandarine', 'Tangerine', 'Papaya', 'Passionfruit', 'Peach', 'Pear', 'Persimmon', 'Plantain', 'Plum', 'Pineapple', 'Pomegranate', 'Pomelo', 'Quince', 'Raspberry', 'Salmonberry', 'Rambutan', 'Redcurrant', 'Salak', 'Satsuma', 'Soursop', 'Star fruit', 'Strawberry', 'Tamarillo', 'Tamarind', 'Yuzu'];
-
+//A default no-results string to be used if nothing is found
+const noResult = "No Results Found";
 
 //Searches through the fruit array for any matches
 function search(str) {
@@ -13,6 +14,10 @@ function search(str) {
 	//filters the fruit based on whether each fruit contains the string
 	//Also coverts the fruit to lowercase when searching
 	let results = fruit.filter(eachFruit => eachFruit.toLowerCase().includes(lowerStr));
+	//If there are no fruits found, it will return that nothing has been found
+	if (results.length == 0){
+		results.push(noResult);
+	}
 	return results;
 }
 
@@ -40,7 +45,6 @@ function searchHandler(e) {
 	}else{
 		//Repopulates the box with the default value
 		input.value = input.defaultValue;
-		//console.log("Nothing is being searched");
 	}
 }
 
@@ -59,14 +63,21 @@ function showSuggestions(results, inputVal) {
 	results.forEach(eachResult => {
 		//Creates an li element
 		let suggLI = document.createElement('li');
-		//Sets the inner text to be the result with the part containing the query to be bold
-		suggLI.innerHTML = boldSuggestion(eachResult, inputVal);
-
-		//Mouseover listener to highlight each search result
-		suggLI.addEventListener('mouseover', highlightSuggestion);
-		//Mouseout listener to un-highlight each result
-		suggLI.addEventListener('mouseout', unhighlightSuggestion);
-
+		//Adds listeners and bold sections
+		//It only does this if it has found fruit
+		if (eachResult !== noResult){
+			//Sets the matching part of the fruit to be bold
+			suggLI.innerHTML = boldSuggestion(eachResult, inputVal);
+			//Mouseover listener to highlight each search result
+			suggLI.addEventListener('mouseover', highlightSuggestion);
+			//Mouseout listener to un-highlight each result
+			suggLI.addEventListener('mouseout', unhighlightSuggestion);
+		}else{
+			//It does not add any listeners for a no-result
+			suggLI.innerText = noResult;
+			//Adds a custom class to the no-result
+			suggLI.classList.add('noResult');
+		}
 		//Appends the new li to the ul
 		suggestions.appendChild(suggLI);
 	});
@@ -94,6 +105,11 @@ function boldSuggestion(fruit, query){
 function useSuggestion(e) {
 	// gets the target of the users click
 	let targetLI = e.target;
+	//Checks if they clicked a no-result
+	if(targetLI.classList[0] == 'noResult'){
+		//Ends the function
+		return;
+	}
 	//Checks if the user clicked on the bold section
 	if (targetLI.tagName == "B"){
 		//sets the target to the parent element
